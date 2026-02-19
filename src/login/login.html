@@ -1,0 +1,39 @@
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 90vh;">
+    <div class="card shadow-lg border-0 rounded-4" style="max-width: 420px; width: 100%;">
+        <div class="card-header bg-primary text-white text-center py-4 rounded-top-4">
+            <h3 class="mb-1">🔐 Smart Dorm</h3>
+            <p class="small mb-0 opacity-75">ระบบจัดการหอพัก</p>
+        </div>
+
+        <div class="card-body p-4">
+            <div if.bind="errorMessage" class="alert alert-danger small text-center">
+                ⚠️ ${errorMessage}
+            </div>
+
+            <form submit.trigger="login()">
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">ชื่อผู้ใช้งาน</label>
+                    <input type="text"
+                        value.bind="username"
+                        class="form-control form-control-lg"
+                        placeholder="Username"
+                        required>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small fw-bold">รหัสผ่าน</label>
+                    <input type="password"
+                        value.bind="password"
+                        class="form-control form-control-lg"
+                        placeholder="Password"
+                        required>
+                </div>
+
+                <button class="btn btn-primary w-100 py-2 fw-bold" disabled.bind="isLoading">
+                    <span if.bind="!isLoading">เข้าสู่ระบบ</span>
+                    <span if.bind="isLoading" class="spinner-border spinner-border-sm"></span>
+                </button>
+            </form>
+        </div>
+    </div>
+</div>

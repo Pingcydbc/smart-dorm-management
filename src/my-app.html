@@ -1,0 +1,30 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top py-2">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-4 d-flex align-items-center" load="login">
+            <span class="text-primary me-2">🏢</span> Smart Dorm
+        </a>
+
+        <div class="navbar-nav ms-auto align-items-center">
+            <div if.bind="username" class="d-flex align-items-center">
+                <span class="text-light me-3 small opacity-75">
+                    <i class="bi bi-person-circle me-1"></i> สวัสดี, <strong>${username}</strong>
+                </span>
+
+                <button click.trigger="logout()" class="btn btn-outline-danger btn-sm px-3 rounded-pill border-2 fw-bold">
+                    <i class="bi bi-door-open me-1"></i> ออกจากระบบ
+                </button>
+            </div>
+
+            <a else load="login" class="btn btn-primary btn-sm px-4 rounded-pill fw-bold">
+                เข้าสู่ระบบ
+            </a>
+        </div>
+    </div>
+</nav>
+
+<main class="container my-5">
+    <au-viewport></au-viewport>
+</main>

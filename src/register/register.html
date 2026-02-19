@@ -1,0 +1,24 @@
+<div class="container mt-5">
+    <div class="card shadow-sm mx-auto" style="max-width: 400px;">
+        <div class="card-header bg-success text-white text-center">
+            <h4>ลงทะเบียนผู้เช่าใหม่</h4>
+        </div>
+        <div class="card-body">
+            <form submit.trigger="register()">
+                <div class="mb-3">
+                    <label class="form-label">เลขห้อง</label>
+                    <input type="number" value.bind="roomId" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">ชื่อผู้ใช้งาน</label>
+                    <input type="text" value.bind="username" class="form-control" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">รหัสผ่าน</label>
+                    <input type="password" value.bind="password" class="form-control" required>
+                </div>
+                <button type="submit" class="btn btn-success w-100">สมัครสมาชิก</button>
+            </form>
+        </div>
+    </div>
+</div>

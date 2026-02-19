@@ -1,0 +1,269 @@
+<div class="container-fluid py-4" style="background-color: #f8f9fa; min-height: 100vh;">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="fw-bold text-dark mb-0">🏢 Smart Dorm</h1>
+                <p class="text-muted mb-0">แผงควบคุมการจัดการหอพักอัจฉริยะ</p>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5">
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                    <div class="card-body p-4 border-start border-primary border-5">
+                        <p class="text-uppercase small fw-bold text-muted mb-1">ห้องทั้งหมด</p>
+                        <h2 class="fw-black mb-0">${rooms.length} <span class="fs-6 fw-normal text-muted">ห้อง</span>
+                        </h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                    <div class="card-body p-4 border-start border-success border-5">
+                        <p class="text-uppercase small fw-bold text-muted mb-1">ว่างพร้อมเช่า</p>
+                        <h2 class="fw-black text-success mb-0">${availableRoomsCount} <span
+                                class="fs-6 fw-normal text-muted">ห้อง</span></h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                    <div class="card-body p-4 border-start border-info border-5">
+                        <p class="text-uppercase small fw-bold text-muted mb-1">รายได้รายเดือน</p>
+                        <h2 class="fw-black text-primary mb-0">฿${totalRevenue.toLocaleString()}</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                    <div class="card-body p-4 border-start border-warning border-5">
+                        <p class="text-uppercase small fw-bold text-muted mb-1">อัตราการเข้าพัก</p>
+                        <h2 class="fw-black mb-1">${occupancyRate}%</h2>
+                        <div class="progress rounded-pill" style="height: 8px;">
+                            <div class="progress-bar bg-warning shadow-sm" style.bind="{ width: occupancyRate + '%' }">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 mb-5 overflow-hidden" if.bind="pendingPayments.length > 0">
+            <div class="card-header bg-primary bg-gradient py-3 border-0">
+                <h5 class="mb-0 text-white fw-bold"><i class="bi bi-clock-history me-2"></i>รายการรอตรวจสอบสลิป</h5>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light">
+                        <tr>
+                            <th class="ps-4 py-3">เลขห้อง</th>
+                            <th>ผู้เช่า</th>
+                            <th class="text-end">ยอดชำระ</th>
+                            <th class="text-center">หลักฐาน</th>
+                            <th class="text-end pe-4">การจัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat.for="pay of pendingPayments">
+                            <td class="ps-4 fw-bold text-primary">Room ${pay.roomNumber}</td>
+                            <td class="fw-bold text-dark">${pay.tenantName}</td>
+
+                            <td class="text-end fw-bold text-primary">฿${pay.totalAmount.toLocaleString()}</td>
+
+                            <td class="text-center">
+                                <button click.trigger="viewSlip(pay.slipUrl)"
+                                    class="btn btn-sm btn-light rounded-3 px-3">
+                                    🖼️ ดูสลิป
+                                </button>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm rounded-3">
+                                    <button click.trigger="approvePayment(pay)"
+                                        class="btn btn-success px-3 btn-sm">อนุมัติ</button>
+                                    <button click.trigger="rejectPayment(pay)"
+                                        class="btn btn-danger px-3 btn-sm">ปฏิเสธ</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-lg rounded-4 mb-5 overflow-hidden">
+            <div class="card-header bg-white py-4 border-0">
+                <div class="row align-items-center">
+                    <div class="col-md-4">
+                        <h5 class="fw-bold mb-0">📋 จัดการห้องพัก</h5>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <input type="text" value.bind="searchTerm"
+                                    class="form-control form-control-sm border-0 bg-light rounded-3"
+                                    placeholder="🔍 เลขห้อง...">
+                            </div>
+                            <div class="col-md-4">
+                                <select value.bind="filterStatus"
+                                    class="form-select form-select-sm border-0 bg-light rounded-3">
+                                    <option value="All">สถานะ: ทั้งหมด</option>
+                                    <option value="Available">ว่าง</option>
+                                    <option value="Occupied">ไม่ว่าง</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select value.bind="filterType"
+                                    class="form-select form-select-sm border-0 bg-light rounded-3">
+                                    <option value="All">ประเภท: ทั้งหมด</option>
+                                    <option value="Air">❄️ แอร์</option>
+                                    <option value="Fan">🌀 พัดลม</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="bg-light text-muted small uppercase">
+                        <tr>
+                            <th class="ps-4">เลขห้อง</th>
+                            <th>ประเภท</th>
+                            <th class="text-end">ค่าเช่า</th>
+                            <th class="text-center">สถานะ</th>
+                            <th>ผู้เช่า</th>
+                            <th class="text-end pe-4">จัดการ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr repeat.for="room of filteredRooms">
+                            <td class="ps-4 fw-bold fs-5">${room.roomNumber}</td>
+                            <td>
+                                <span
+                                    class="badge rounded-pill ${room.type === 'Air' ? 'bg-info bg-opacity-10 text-info' : 'bg-secondary bg-opacity-10 text-secondary'} px-3">
+                                    ${room.type === 'Air' ? '❄️ แอร์' : '🌀 พัดลม'}
+                                </span>
+                            </td>
+                            <td class="text-end fw-bold">฿${room.monthlyRent.toLocaleString()}</td>
+                            <td class="text-center">
+                                <span
+                                    class="badge rounded-pill ${room.status === 'Available' ? 'bg-success bg-opacity-10 text-success' : 'bg-danger bg-opacity-10 text-danger'} px-3 py-2">
+                                    ${room.status === 'Available' ? '● ว่าง' : '● มีผู้เช่า'}
+                                </span>
+                            </td>
+                            <td>
+                                <div if.bind="room.currentTenant" class="d-flex align-items-center">
+                                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle p-2 me-2"
+                                        style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-person"></i>
+                                    </div>
+                                    <span class="small fw-bold text-dark">${room.currentTenant.name}</span>
+                                </div>
+                                <span else class="text-muted small italic">ไม่มีผู้เช่า</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group shadow-sm">
+                                    <button click.trigger="openCheckInModal(room)"
+                                        class="btn btn-sm ${room.status === 'Available' ? 'btn-success' : 'btn-outline-danger'} px-3">
+                                        ${room.status === 'Available' ? 'เช็คอิน' : 'เช็คเอาต์'}
+                                    </button>
+                                    <button if.bind="room.status === 'Occupied'" click.trigger="openUtilityModal(room)"
+                                        class="btn btn-sm btn-info text-white">
+                                        💧⚡ จดมิเตอร์
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade show" if.bind="showModal"
+    style="display: block; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="fw-bold">📝 บันทึกการเช็คอิน</h5>
+                <button type="button" class="btn-close" click.trigger="showModal = false"></button>
+            </div>
+            <div class="modal-body p-4">
+                <div class="bg-light rounded-3 p-3 mb-3 text-center">
+                    <span class="text-muted small uppercase fw-bold">กำลังจองห้อง</span>
+                    <h3 class="fw-black text-primary mb-0">${selectedRoom?.roomNumber}</h3>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">ชื่อผู้เช่า</label>
+                    <input type="text" value.bind="tenantName" class="form-control border-0 bg-light p-3"
+                        placeholder="ระบุชื่อ-นามสกุล">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label small fw-bold">เบอร์โทรศัพท์</label>
+                    <input type="text" value.bind="tenantPhone" class="form-control border-0 bg-light p-3"
+                        placeholder="0xx-xxxxxxx">
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button class="btn btn-light rounded-pill px-4" click.trigger="showModal = false">ยกเลิก</button>
+                <button class="btn btn-primary rounded-pill px-4 fw-bold"
+                    click.trigger="confirmCheckIn()">ยืนยันการเช็คอิน</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade show" if.bind="showUtilityModal"
+    style="display: block; background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px);">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+            <div class="modal-header border-0">
+                <h5 class="fw-bold">📉 บันทึกมิเตอร์ประจำเดือน</h5>
+                <button type="button" class="btn-close" click.trigger="showUtilityModal = false"></button>
+            </div>
+            <div class="modal-body p-4 pt-0">
+                <div class="row g-3">
+                    <div class="col-12">
+                        <div class="alert alert-info py-2 rounded-3 border-0 small text-center">ห้อง
+                            ${selectedRoom?.roomNumber}</div>
+                    </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-primary mb-2">⚡ ไฟฟ้า (ครั้งก่อน)</label>
+                        <input type="number" value.bind="prevElectric" class="form-control border-0 bg-light" readonly>
+                    </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-danger mb-2">⚡ ไฟฟ้า (ครั้งนี้)</label>
+                        <input type="number" value.bind="currElectric"
+                            class="form-control border-danger bg-danger bg-opacity-10 text-danger">
+                    </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-info mb-2">💧 ประปา (ครั้งก่อน)</label>
+                        <input type="number" value.bind="prevWater" class="form-control border-0 bg-light" readonly>
+                    </div>
+                    <div class="col-6">
+                        <label class="small fw-bold text-danger mb-2">💧 ประปา (ครั้งนี้)</label>
+                        <input type="number" value.bind="currWater"
+                            class="form-control border-danger bg-danger bg-opacity-10 text-danger">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button class="btn btn-primary w-100 rounded-3 py-2 fw-bold"
+                    click.trigger="saveUtilityUsage()">บันทึกข้อมูลและออกบิล</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade show" if.bind="showSlipModal"
+    style="display: block; background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);"
+    click.trigger="showSlipModal = false">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content bg-transparent border-0 text-center">
+            <p class="text-white small mb-3">คลิกที่ใดก็ได้เพื่อปิด</p>
+            <img if.bind="selectedSlipUrl" src="http://localhost:5000${selectedSlipUrl}"
+                class="img-fluid rounded-4 shadow-lg mx-auto" style="max-height: 85vh;">
+        </div>
+    </div>
+</div>
