@@ -25,14 +25,14 @@ export class Dashboard {
     public prevWater = 0;
     public currWater = 0;
 
-    // ✅ เพิ่มตัวแปรสำหรับระบบจัดการสลิป (เพื่อให้ my-app.ts และ dashboard.html หายแดง)
+    // --- ตัวแปรสำหรับระบบจัดการสลิป
     public pendingPayments: any[] = [];
     public showSlipModal: boolean = false;
     public selectedSlipUrl: string = '';
 
     async attached() {
         await this.loadRooms();
-        await this.loadPendingPayments(); // ⚡ ดึงข้อมูลสลิปทันทีที่เข้าหน้าจอ
+        await this.loadPendingPayments();
     }
 
     async loadRooms() {
@@ -46,35 +46,24 @@ export class Dashboard {
         }
     }
 
-    // ✅ ฟังก์ชันดึงรายการสลิปที่รอตรวจสอบจาก Backend
-    // ✅ แก้ไขฟังก์ชันดึงรายการสลิปเพื่อให้ได้ข้อมูลชื่อผู้เช่าและวันที่
     async loadPendingPayments() {
         try {
-            // แนะนำให้ใช้ this.http (Aurelia Fetch Client) แทน fetch ปกติเพื่อให้เป็นมาตรฐานเดียวกัน
             const response = await this.http.fetch("http://localhost:5000/api/Payment/pending");
-
             if (response.ok) {
                 const data = await response.json();
-
-                // ตรวจสอบว่า Backend ส่งข้อมูลมาในรูปแบบที่มีการ Join ตารางมาแล้วหรือไม่
-                // ข้อมูลควรประกอบด้วย: id, roomNumber, tenantName, paymentDate, slipUrl
                 this.pendingPayments = data;
 
                 console.log("รายการสลิปที่โหลดมา:", this.pendingPayments);
             }
         } catch (error) {
             console.error('ไม่สามารถดึงรายการสลิปได้:', error);
-            // ไม่ต้องแสดง Alert ทุกครั้งที่โหลดพลาดเพื่อไม่ให้กวนการทำงานหน้าหลัก
         }
     }
-
-    // ✅ ฟังก์ชันดูรูปสลิป
     viewSlip(url: string) {
         if (!url) {
             console.warn('ไม่มี slipUrl');
             return;
         }
-
         this.selectedSlipUrl = url;
         this.showSlipModal = true;
     }
@@ -92,13 +81,11 @@ export class Dashboard {
             confirmButtonText: 'ใช่, อนุมัติเลย',
             cancelButtonText: 'ยกเลิก'
         });
-
         if (result.isConfirmed) {
             try {
                 const response = await this.http.fetch(`http://localhost:5000/api/Payment/approve/${payment.id}`, {
                     method: 'POST'
                 });
-
                 if (response.ok) {
                     Swal.fire('สำเร็จ!', 'อนุมัติการชำระเงินเรียบร้อยแล้ว', 'success');
                     await this.loadPendingPayments();
